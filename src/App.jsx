@@ -1,6 +1,7 @@
 import { useState , useEffect } from 'react'
 import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx';
+import MovieCard from './components/MovieCard.jsx';
 
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -19,10 +20,11 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('');
   const [moviesList, setMoviesList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const fetchMovies = async () => {
+  const fetchMovies = async (query='') => {
     setLoading(true);
     try {
-      const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+      const endpoint = query ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` 
+      : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
       const response = await fetch(endpoint, API_OPTIONS);
       if (!response.ok) {
         throw new Error(`Failed to fetch movies`);
@@ -42,8 +44,8 @@ function App() {
     }
   }
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchMovies(searchTerm);
+  }, [searchTerm]);
   return (
     <main>
       <div className='pattern'></div>
@@ -64,7 +66,7 @@ function App() {
             ) : (
             <ul>
               {moviesList.map((movie)=>(
-                <p key={movie.id} className='text-white'>{movie.title}</p>
+                <MovieCard key={movie.id} movie={movie}/>
                 ))}
             </ul>)
           }
