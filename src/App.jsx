@@ -1,4 +1,5 @@
 import { useState , useEffect } from 'react'
+import {useDebounce, useStartTyping} from 'react-use'
 import Search from './components/Search.jsx'
 import Spinner from './components/Spinner.jsx';
 import MovieCard from './components/MovieCard.jsx';
@@ -20,6 +21,10 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('');
   const [moviesList, setMoviesList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
+
   const fetchMovies = async (query='') => {
     setLoading(true);
     try {
@@ -44,8 +49,8 @@ function App() {
     }
   }
   useEffect(() => {
-    fetchMovies(searchTerm);
-  }, [searchTerm]);
+    fetchMovies(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
   return (
     <main>
       <div className='pattern'></div>
